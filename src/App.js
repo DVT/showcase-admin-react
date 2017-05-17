@@ -45,13 +45,13 @@ class App extends Component {
           {app.name}
         </CardHeader>
       </Card>);
-      
     }
 
     return html;
   }
 
   addApp() {
+    this.props.history.push('/add-app/');
     
   }
 

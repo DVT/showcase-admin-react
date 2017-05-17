@@ -5,6 +5,7 @@ import './index.css';
 import * as firebase from "firebase";
 import 'material-components-web/dist/material-components-web.min.css';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import AddApp from './add-app/add-app'
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRpZkISgvHK7MQ-sjIdEzhKufnNcJKF8U",
@@ -21,6 +22,7 @@ ReactDOM.render(
   <Router>
     <Switch>
       <Route exact path="/" component={App}/>
+      <Route exact path="/add-app" component={AddApp}/>
     </Switch>
   </Router>,
   document.getElementById('root')
