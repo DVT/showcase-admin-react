@@ -1,3 +1,11 @@
 .App {
-  text-align: center;
+  margin: 8px;
+}
+
+.AppCard {
+  margin-top: 8px;
+}
+
+.addAppFab {
+  margin: 8px;
 }
