@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import * as firebase from "firebase";
+import firebase from './firebase';
 import {Card} from 'react-mdc-web';
 import {CardText} from 'react-mdc-web';
 import {CardHeader} from 'react-mdc-web';

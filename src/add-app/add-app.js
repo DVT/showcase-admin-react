@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './add-app.css';
-import * as firebase from "firebase";
+import firebase from './../firebase';
 import {Card, CardHeader, CardTitle, CardActions, Button,Textfield} from 'react-mdc-web';
 import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle} from 'react-mdc-web';
 
