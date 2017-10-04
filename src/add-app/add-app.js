@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './add-app.css';
 import firebase from './../firebase';
-import {Card, CardHeader, CardTitle, CardActions, Button,Textfield} from 'react-mdc-web';
+import {Card, CardHeader, CardTitle, CardActions, Button, Textfield, FormField, Checkbox} from 'react-mdc-web';
 import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle} from 'react-mdc-web';
 
 class AddApp extends Component {
@@ -21,7 +21,7 @@ class AddApp extends Component {
       iOSURL: "",
       images: [],
       imagesAsData: [],
-      enabled: false,
+      enabled: true,
       key: ""
     }
   }
@@ -250,6 +250,15 @@ render() {
               onChange={(event) => {
                 this.setState({iOSURL: event.target.value});
               }}/>
+            <FormField id="labeled-checkbox">
+              <Checkbox 
+                onChange={({target: {checked}})=>{
+                  this.setState({enabled: checked})
+                }}
+                checked={this.state.enabled}
+              />
+              <label>Enabled?</label>
+            </FormField>
             <input
               className="AddAppInput"
               multiple
@@ -288,7 +297,7 @@ render() {
           </Card>
         </div>
     )
-};
+  };
 }
 
 export default AddApp;
