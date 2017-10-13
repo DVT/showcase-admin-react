@@ -5,7 +5,7 @@ import {Card} from 'react-mdc-web';
 import {CardText} from 'react-mdc-web';
 import {CardHeader} from 'react-mdc-web';
 import {TextField} from 'react-mdc-web';
-import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, IconToggle} from 'react-mdc-web';
+import {Button, Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, IconToggle} from 'react-mdc-web';
 import {Fab} from 'react-mdc-web';
 import {Icon} from 'react-mdc-web';
 
@@ -47,6 +47,11 @@ class App extends Component {
   editApp(i, event) {
     event.stopPropagation();
     var app = this.state.apps[i];
+    
+    this.props.history.push({
+      pathname: '/add-app/',
+      state: app
+    });
   }
 
   getAppsFromStateAsHtml() {
@@ -65,12 +70,11 @@ class App extends Component {
               <b>Client:</b> {app.client}<br/>
               <b>ID:</b> {app.id}<br/>
               <b>Short Description:</b> {app.shortDescription}<br/>
-              <b>Long Description:</b> {app.longDescription}<br/>
               <b>Functionality:</b> {app.functionality}<br/>
               <b>Technologies:</b> {app.technologyUsed}<br/>
+              <b>Industry:</b> {app.industry}<br/>
               <b>Android Package Name:</b> {app.androidPackageName}<br/>
               <b>iOS URL:</b> {app.iosUrl}<br/>
-              <b>Functionality:</b> {app.functionality}<br/>
             </CardText>
           </Card>);
       } else {
@@ -92,18 +96,13 @@ class App extends Component {
     this.props.history.push('/add-app/');
   }
 
-  editApp(index) {
-    this.props.history.push({
-      pathname: '/add-app/',
-      state: {
-
-      }
-    });
+  login() {
+    firebase.login();
   }
 
   render() {
     return (
-      <div className="App">
+      <div>
         <Toolbar>
           <ToolbarRow>
             <ToolbarSection align="start">
@@ -111,8 +110,14 @@ class App extends Component {
             </ToolbarSection>
           </ToolbarRow>
         </Toolbar>
-        {this.getAppsFromStateAsHtml()}
+        <div className="Cards">
+          {this.getAppsFromStateAsHtml()}
+        </div>
         <Fab className="addAppFab" onClick={this.addApp.bind(this)}><Icon name='create'/></Fab>
+        <Button raised primary
+              className="AddAppSaveButton"
+              onClick={this.login.bind(this)}
+              >Login</Button>
       </div>
     );
   }
