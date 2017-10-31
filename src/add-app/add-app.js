@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router';
 import './add-app.css';
 import firebase from './../firebase';
 import {Card, CardHeader, CardTitle, CardActions, Button, Textfield, FormField, Checkbox} from 'react-mdc-web';
@@ -10,8 +11,9 @@ class AddApp extends Component {
     super();
     if(props && props.location.state) {
       this.state = props.location.state;
+      this.state.images = this.state.screenshots;
       this.state.technologies = this.state.technologyUsed;
-      this.state.edit = true;
+      this.state.editMode = true;
       
       console.log("Found state: " + JSON.stringify(this.state));
     } else {
@@ -31,7 +33,7 @@ class AddApp extends Component {
       }  
     }
   }
-  
+
   componentDidMount() {
     firebase.auth().getRedirectResult().then(function(result) {
       if (result.credential) {
@@ -47,6 +49,19 @@ class AddApp extends Component {
     }).catch(function(error) {
       alert("Google authentication failed");
     });
+
+    if(this.state.screenshots) {
+      this.state.screenshots.map((imageUrl, index) => {
+        var self = this;
+        firebase.storage().ref().child(imageUrl).getDownloadURL().then((url) => {
+          var images = self.state.images || [];
+          images.push(url);
+          self.setState({
+            images: images
+          });
+        });
+      }, this);
+    }
   }
 
   login() {
@@ -69,16 +84,8 @@ class AddApp extends Component {
     var reader = new FileReader();
     reader.onload = function(e) {
         // console.log("Got image!" + reader.result);
-        var images = scope.state.images;
-        var imagesAsData = scope.state.imagesAsData;
-
-        if(!images) {
-          images = [];
-        }
-
-        if(!imagesAsData) {
-          imagesAsData = [];
-        }
+        var images = scope.state.images || [];
+        var imagesAsData = scope.state.imagesAsData || [];
 
         images.push(image);
         imagesAsData.push(reader.result);
@@ -96,14 +103,50 @@ class AddApp extends Component {
   }
 
   getImagesAsHTMLFromState() {
-    var currentImages = this.state.imagesAsData || [];
+    var currentImages = this.state.images || [];
     
     var images = currentImages.map((image, index) => {
       return (
-        <img src={image} key={index} className="image" alt=""/>
+        <img src={image} key={index} className="Image" alt=""/>
       );
     });
+
+    console.log("Returning images: " + images.toString());
     return images;
+  }
+
+  getNewImagesAsHTMLFromState() {
+    var currentImagesAsData = this.state.imagesAsData || [];
+    
+    var images = currentImagesAsData.map((image, index) => {
+      return (
+        <img src={image} key={index} className="Image" alt=""/>
+      );
+    });
+    
+    console.log("Returning new images: " + images.toString());
+    return images;
+  }
+
+  showImages() {
+    //TODO move these to seperate components
+    if(this.state.editMode) {
+      return (
+        <div>
+          <div className="NewImages">
+            {this.getNewImagesAsHTMLFromState()}
+        </div>
+        <div className="ExistingImages">
+          {this.getImagesAsHTMLFromState()}
+        </div>
+      </div>);
+    } else {
+      return (
+        <div className="NewImages">
+            {this.getNewImagesAsHTMLFromState()}
+        </div>
+      )
+    }
   }
 
   saveButtonClicked(event) {
@@ -135,7 +178,9 @@ class AddApp extends Component {
         var imageReferenceList = [];
         scope.uploadImageForApp(app.name, imageQueue, imageReferenceList);
       } else {
-        alert("Upload complete!"); 
+        //TODO loader
+        //TODO show success dialog on ViewApps component
+        this.props.history.goBack();
       }
     }).catch(function(error) {
       //TODO hide loader & show error message
@@ -290,7 +335,7 @@ render() {
               onDragOver={this.preventDefault} onDrop={(e) => {this.onDrop(e)}}>
                 or drop your images here
               </div>
-              {this.getImagesAsHTMLFromState()}
+              {this.showImages()}
             <CardActions>
               <Button raised primary
               className="AddAppSaveButton"
@@ -303,4 +348,4 @@ render() {
   };
 }
 
-export default AddApp;
+export default withRouter(AddApp);
