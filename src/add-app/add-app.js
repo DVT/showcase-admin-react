@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router';
 import './add-app.css';
 import firebase from './../firebase';
 import {Card, CardHeader, CardTitle, CardActions, Button, Textfield, FormField, Checkbox} from 'react-mdc-web';
@@ -6,23 +7,30 @@ import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle} from 'react-mdc-web';
 
 class AddApp extends Component {
 
-  constructor() {
+  constructor(props) {
     super();
-    this.state = {
-      name: "",
-      client: "",
-      id: "",
-      shortDescription: "",
-      longDescription: "",
-      functionality: "",
-      technologies: "",
-      industry: "",
-      androidPackageName: "",
-      iOSURL: "",
-      images: [],
-      imagesAsData: [],
-      enabled: true,
-      key: ""
+    if(props && props.location.state) {
+      this.state = props.location.state;
+      this.state.images = this.state.screenshots;
+      this.state.technologies = this.state.technologyUsed;
+      this.state.editMode = true;
+      
+      console.log("Found state: " + JSON.stringify(this.state));
+    } else {
+      this.state = {
+        name: "",
+        client: "",
+        id: "",
+        shortDescription: "",
+        functionality: "",
+        technologies: "",
+        industry: "",
+        androidPackageName: "",
+        iosUrl: "",
+        images: [],
+        imagesAsData: [],
+        enabled: true
+      }  
     }
   }
 
@@ -41,11 +49,23 @@ class AddApp extends Component {
     }).catch(function(error) {
       alert("Google authentication failed");
     });
+
+    if(this.state.screenshots) {
+      this.state.screenshots.map((imageUrl, index) => {
+        var self = this;
+        firebase.storage().ref().child(imageUrl).getDownloadURL().then((url) => {
+          var images = self.state.images || [];
+          images.push(url);
+          self.setState({
+            images: images
+          });
+        });
+      }, this);
+    }
   }
 
   login() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithRedirect(provider);
+    firebase.login();
   }
 
   onDrop(event) {
@@ -63,9 +83,10 @@ class AddApp extends Component {
     var scope = this;
     var reader = new FileReader();
     reader.onload = function(e) {
-        console.log("Got image!" + reader.result);
-        var images = scope.state.images;
-        var imagesAsData = scope.state.imagesAsData;
+        // console.log("Got image!" + reader.result);
+        var images = scope.state.images || [];
+        var imagesAsData = scope.state.imagesAsData || [];
+
         images.push(image);
         imagesAsData.push(reader.result);
         scope.setState({
@@ -82,14 +103,50 @@ class AddApp extends Component {
   }
 
   getImagesAsHTMLFromState() {
-    var currentImages = this.state.imagesAsData;
+    var currentImages = this.state.images || [];
+    
     var images = currentImages.map((image, index) => {
       return (
-        <img src={image} key={index} className="image" alt=""/>
+        <img src={image} key={index} className="Image" alt=""/>
       );
     });
 
+    console.log("Returning images: " + images.toString());
     return images;
+  }
+
+  getNewImagesAsHTMLFromState() {
+    var currentImagesAsData = this.state.imagesAsData || [];
+    
+    var images = currentImagesAsData.map((image, index) => {
+      return (
+        <img src={image} key={index} className="Image" alt=""/>
+      );
+    });
+    
+    console.log("Returning new images: " + images.toString());
+    return images;
+  }
+
+  showImages() {
+    //TODO move these to seperate components
+    if(this.state.editMode) {
+      return (
+        <div>
+          <div className="NewImages">
+            {this.getNewImagesAsHTMLFromState()}
+        </div>
+        <div className="ExistingImages">
+          {this.getImagesAsHTMLFromState()}
+        </div>
+      </div>);
+    } else {
+      return (
+        <div className="NewImages">
+            {this.getNewImagesAsHTMLFromState()}
+        </div>
+      )
+    }
   }
 
   saveButtonClicked(event) {
@@ -99,25 +156,31 @@ class AddApp extends Component {
       client: this.state.client,
       id: this.state.id,
       shortDescription: this.state.shortDescription,
-      longDescription: this.state.longDescription,
       functionality: this.state.functionality,
       technologyUsed: this.state.technologies,
       industry: this.state.industry,
-      shortDescription: this.state.shortDescription,
-      longDescription: this.state.longDescription,
-      androidPackageName: this.state.androidPackageName,
-      iOSURL: this.state.iOSURL,
-      enabled: true
+      enabled: this.state.enabled
     };
+
+    if(this.state.androidPackageName && this.state.androidPackageName.length > 0) {
+      app.androidPackageName = this.state.androidPackageName;
+    }
+
+    if(this.state.iosUrl && this.state.iosUrl.length > 0) {
+      app.iosUrl = this.state.iosUrl;
+    }
+
     console.log(app);
-    firebase.database().ref("apps/").push(app).then((result) => {
-      scope.state.key = result.key;
+
+    firebase.database().ref("apps/" + app.name).set(app).then(() => {
       var imageQueue = scope.state.images;
-      if(imageQueue.length > 0) {
+      if(imageQueue && imageQueue.length > 0) {
         var imageReferenceList = [];
-        scope.uploadImageForApp(scope.state.id, imageQueue, imageReferenceList);
+        scope.uploadImageForApp(app.name, imageQueue, imageReferenceList);
       } else {
-        alert("Upload complete!"); 
+        //TODO loader
+        //TODO show success dialog on ViewApps component
+        this.props.history.goBack();
       }
     }).catch(function(error) {
       //TODO hide loader & show error message
@@ -150,19 +213,16 @@ class AddApp extends Component {
   }
 
   updateAppImageReferences(imageReferenceList) {
-      if(this.state.key.length > 0) {
-        var update = { };
-        update["apps/" + this.state.key + "/screenshots"] = imageReferenceList
-        
-        firebase.database().ref().update(update).then(function(result){
-          alert("Upload complete!"); 
-        }).catch(function(error){
-          alert("Updating app image references failed..."); 
-        });
-      } else {
-        alert("No app key found. Something went horribly, horribly wrong... "); 
-      }   
+      var update = {};
+      update["apps/" + this.state.name + "/screenshots"] = imageReferenceList
+      
+      firebase.database().ref().update(update).then(function(result){
+        alert("Upload complete!"); 
+      }).catch(function(error){
+        alert("Updating app image references failed..."); 
+      });
   }
+
 render() {
     return (
       <div >
@@ -209,13 +269,6 @@ render() {
               }}/>
             <Textfield
               className="AddAppInput"
-              floatingLabel="Long description"
-              value={this.state.longDescription}
-              onChange={(event) => {
-                this.setState({longDescription: event.target.value});
-              }}/>
-            <Textfield
-              className="AddAppInput"
               floatingLabel="Functionality"
               multiline
               value={this.state.functionality}
@@ -246,9 +299,9 @@ render() {
             <Textfield
               className="AddAppInput"
               floatingLabel="iOS URL"
-              value={this.state.iOSURL}
+              value={this.state.iosUrl}
               onChange={(event) => {
-                this.setState({iOSURL: event.target.value});
+                this.setState({iosUrl: event.target.value});
               }}/>
             <FormField id="labeled-checkbox">
               <Checkbox 
@@ -282,17 +335,12 @@ render() {
               onDragOver={this.preventDefault} onDrop={(e) => {this.onDrop(e)}}>
                 or drop your images here
               </div>
-              {this.getImagesAsHTMLFromState()}
+              {this.showImages()}
             <CardActions>
               <Button raised primary
               className="AddAppSaveButton"
               onClick={this.saveButtonClicked.bind(this)}
               >Save</Button>
-
-              <Button raised primary
-              className="AddAppSaveButton"
-              onClick={this.login.bind(this)}
-              >Login</Button>
             </CardActions>
           </Card>
         </div>
@@ -300,4 +348,4 @@ render() {
   };
 }
 
-export default AddApp;
+export default withRouter(AddApp);

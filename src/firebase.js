@@ -10,4 +10,9 @@ const firebaseConfig = {
 
 var fire = firebase.initializeApp(firebaseConfig);
 
+fire.login = function() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithRedirect(provider);
+}
+
 export default fire;
