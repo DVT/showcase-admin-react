@@ -1,0 +1,10 @@
+.loginContainer {
+    text-align: center;
+    width: 600px;
+    margin-left: 20px;
+    margin-top: 16px;
+}
+
+.LoginButton {
+    background: red;
+}

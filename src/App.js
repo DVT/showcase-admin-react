@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle} from 'react-mdc-web';
 import ViewApps from './view-apps/view-apps';
+import Login from './login/login';
 
 class App extends Component {
 
@@ -15,7 +16,7 @@ class App extends Component {
             </ToolbarSection>
           </ToolbarRow>
         </Toolbar>
-        <ViewApps/>
+        <Login/>
       </div>
     );
   }
