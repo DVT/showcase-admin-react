@@ -1,11 +1,18 @@
-.Cards {
+.LoginButton {
   margin: 8px;
 }
 
-.AppCard {
-  margin-top: 8px;
+.LoginWelcomeText {
+  font-size: 14pt;
 }
 
-.addAppFab {
-  margin: 8px;
+.PreLoginContainer {
+  padding-top: 16px;
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+.ErrorMessageContainer {
+  color: red;
 }

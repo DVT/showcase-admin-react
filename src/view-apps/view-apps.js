@@ -97,21 +97,16 @@ class ViewApps extends Component {
     this.props.history.push('/add-app/');
   }
 
-  login() {
-    firebase.login();
-  }
-
   render() {
     return (
       <div>
+        {this.state.loading && 
+                <div className="Loader"></div>
+            }
         <div className="Cards">
           {this.getAppsFromStateAsHtml()}
         </div>
         <Fab className="addAppFab" onClick={this.addApp.bind(this)}><Icon name='create'/></Fab>
-        <Button raised primary
-              className="AddAppSaveButton"
-              onClick={this.login.bind(this)}
-              >Login</Button>
       </div>
     );
   }

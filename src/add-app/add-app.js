@@ -35,20 +35,10 @@ class AddApp extends Component {
   }
 
   componentDidMount() {
-    firebase.auth().getRedirectResult().then(function(result) {
-      if (result.credential) {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        // var token = result.credential.accessToken;
-        // var id_token = result.credential.idToken;
-        console.log("Sign in successful! " + result);
-        alert("Google authentication successful!");
-      }
-
-      // The signed-in user info.
-      // var user = result.user;
-    }).catch(function(error) {
-      alert("Google authentication failed");
-    });
+    if(!firebase.auth().currentUser) {
+      this.props.history.replace({pathname: '/'});
+      return;
+    }
 
     if(this.state.screenshots) {
       this.state.screenshots.map((imageUrl, index) => {

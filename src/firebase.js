@@ -12,7 +12,11 @@ var fire = firebase.initializeApp(firebaseConfig);
 
 fire.login = function() {
   var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithRedirect(provider);
+  return firebase.auth().signInWithPopup(provider);
+}
+
+fire.logout = function() {
+  firebase.auth().signOut();
 }
 
 export default fire;
