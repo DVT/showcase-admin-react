@@ -16,7 +16,8 @@ class ViewApps extends Component {
     super();
     this.state = {
       apps: [],
-      appToExpand: {}
+      appToExpand: {},
+      loading: true
     }
   }
 
@@ -31,7 +32,8 @@ class ViewApps extends Component {
       }
 
       this.setState({
-        apps: apps
+        apps: apps,
+        loading: false
       });
     });
   }
@@ -101,12 +103,16 @@ class ViewApps extends Component {
     return (
       <div>
         {this.state.loading && 
-                <div className="Loader"></div>
-            }
+            <div className="Loader"></div>
+        }
         <div className="Cards">
           {this.getAppsFromStateAsHtml()}
         </div>
-        <Fab className="addAppFab" onClick={this.addApp.bind(this)}><Icon name='create'/></Fab>
+        <div className="FABContainer">
+          {!this.state.loading && 
+            <Fab className="AddAppFAB" onClick={this.addApp.bind(this)}><Icon name='create'/></Fab>
+          }
+        </div>
       </div>
     );
   }

@@ -1,13 +1,13 @@
 .AddApp {
   text-align: center;
-  width: 600px;
-  margin-left: 20px;
-  margin-top: 16px;
+  width: 80%;
+  margin: 16px auto 0;
+  background-color: white;
 }
 
 .AddAppInput {
-  margin-left: 20px;
-  margin-right: 20px;
+  width: 90%;
+  margin: auto;
 }
 
 .Image {
@@ -26,8 +26,23 @@
 .AddAppImageDrop {
   margin-top: 8px;
   height: 50px;
-  /*background: green;*/
-  border: 1px solid green;
+  line-height: 50px; /*Must be the same as 'height' so that text is centerd*/
+  text-align: center;
+  border: 1px solid #0069B1;
   margin-left: 20px;
   margin-right: 20px;
+}
+
+.Loader {
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin: 16px auto 0;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(480deg); }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import {Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle} from 'react-mdc-web';
+import ShowcaseToolbar from './toolbar/toolbar'
 import ViewApps from './view-apps/view-apps';
 import firebase from './firebase';
 import {Button} from 'react-mdc-web';
@@ -50,13 +50,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Toolbar>
-          <ToolbarRow>
-            <ToolbarSection align="start">
-              <ToolbarTitle>DVT Showcase Admin</ToolbarTitle>
-            </ToolbarSection>
-          </ToolbarRow>
-        </Toolbar>
+        <ShowcaseToolbar/>
         {this.getContent()}
       </div>
     );
